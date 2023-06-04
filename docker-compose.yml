@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  bionexo-rpa-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - bionexo-rpa-db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+
+  bionexo-rpa-db:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=laravel
+      - MYSQL_ROOT_PASSWORD=root
+
+  bionexo-rpa-selenium:
+    image: selenium/standalone-chrome
+    ports:
+      - 4444:4444
+
+  bionexo-rpa-chromedriver:
+    image: selenium/chromedriver
+    ports:
+      - 9515:9515
+    environment:
+      - SELENIUM_PORT=4444
+
+  bionexo-rpa-web:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - bionexo-rpa-app
