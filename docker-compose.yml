@@ -4,43 +4,53 @@ services:
   bionexo-rpa-app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ___docker/Dockerfile
+    container_name: bionexo-rpa-app
+    restart: unless-stopped
     volumes:
-      - .:/var/www/html
+      - .:/var/www
     depends_on:
       - bionexo-rpa-db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=laravel
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-
-  bionexo-rpa-db:
-    image: mysql:8.0
-    ports:
-      - 3306:3306
-    environment:
-      - MYSQL_DATABASE=laravel
-      - MYSQL_ROOT_PASSWORD=root
-
-  bionexo-rpa-selenium:
-    image: selenium/standalone-chrome
-    ports:
-      - 4444:4444
-
-  bionexo-rpa-chromedriver:
-    image: selenium/chromedriver
-    ports:
-      - 9515:9515
-    environment:
-      - SELENIUM_PORT=4444
+      - bionexo-rpa-web
+    networks:
+      - bionexo-rpa-network
 
   bionexo-rpa-web:
     image: nginx:latest
+    container_name: bionexo-rpa-web
+    restart: unless-stopped
     ports:
-      - 80:80
+      - "8000:80"
     volumes:
-      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - bionexo-rpa-app
+      - .:/var/www
+      - ./___docker/nginx/:/etc/nginx/conf.d/
+    networks:
+      - bionexo-rpa-network
+
+  bionexo-rpa-db:
+    image: mysql:5.7
+    container_name: bionexo-rpa-db
+    restart: unless-stopped
+    volumes:
+        - ./___docker/mysql:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    environment:
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_USER: ${DB_USERNAME}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - bionexo-rpa-network
+
+  bionexo-rpa-selenium:
+    image: selenium/standalone-chrome
+    container_name: bionexo-rpa-selenium
+    ports:
+      - "4444:4444"
+    networks:
+      - bionexo-rpa-network
+
+networks:
+  bionexo-rpa-network:
+    driver: bridge
