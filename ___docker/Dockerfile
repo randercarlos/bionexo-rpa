@@ -10,6 +10,7 @@ RUN apt-get update && \
         libxml2-dev \
         libicu-dev \
         libpq-dev \
+        poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -33,7 +34,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-COPY .. /var/www
+COPY . /var/www
 
 # Set file permissions
 RUN chown -R www-data:www-data /var/www
