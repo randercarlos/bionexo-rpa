@@ -14,7 +14,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Rap2hpoutre\FastExcel\FastExcel;
-use Smalot\PdfParser\Parser;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class RpaService
